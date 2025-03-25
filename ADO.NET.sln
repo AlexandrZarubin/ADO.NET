@@ -5,6 +5,10 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADO.NET", "ADO.NET\ADO.NET.csproj", "{1C34B1F0-6359-44A9-9DEA-82E81D6414F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoviesConnector", "MoviesConnector\MoviesConnector.csproj", "{11EE20DF-4727-4E89-912C-FFE93785872D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADO.NET_V2", "ADO.NET_V2\ADO.NET_V2.csproj", "{286810B0-B617-498E-9FEA-4A105644456F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{1C34B1F0-6359-44A9-9DEA-82E81D6414F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C34B1F0-6359-44A9-9DEA-82E81D6414F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C34B1F0-6359-44A9-9DEA-82E81D6414F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11EE20DF-4727-4E89-912C-FFE93785872D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11EE20DF-4727-4E89-912C-FFE93785872D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11EE20DF-4727-4E89-912C-FFE93785872D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11EE20DF-4727-4E89-912C-FFE93785872D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{286810B0-B617-498E-9FEA-4A105644456F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{286810B0-B617-498E-9FEA-4A105644456F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{286810B0-B617-498E-9FEA-4A105644456F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{286810B0-B617-498E-9FEA-4A105644456F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

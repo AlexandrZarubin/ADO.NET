@@ -4,8 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Data.SqlClient;	//ADO.NET classes
+using System.Data.SqlClient;    //ADO.NET classes
+/*
+	ADO.NET - ActiveX Data Objects
+		System.Data.SqlClient:
+			-SqlConnection  - описывает сетевое соединение с Базой данных;
+			-SqlCommand		- описываеет команду, отправляемую на Сервер;
+			-SqlDataReader	- описывает поток данных от сервера, к клиентскому приложению,
+								а так же позволяет отправлять команды на Сервер;
+			-DataSet		- обеспечивает локальное хранилище данных из Базы;
+			-DataAdapter	- является посредником между DataSet и источником данных;
 
+*/
 namespace ADO.NET
 {
 	internal class Program
