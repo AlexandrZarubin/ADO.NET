@@ -69,8 +69,8 @@ namespace ADO.NET_V2
                 }
 
 			}
-
-            reader.Close();
+			//5) Закрываем поток и соединение с сервером:
+			reader.Close();
 			connection.Close();
 		}
 	}

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{11EE20DF-4727-4E89-912C-FFE93785872D}</ProjectGuid>
+    <ProjectGuid>{1398C00E-53FD-4CE2-A730-FF21EED9ECD4}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MoviesConnector</RootNamespace>
-    <AssemblyName>MoviesConnector</AssemblyName>
+    <RootNamespace>MoviesConnector_V2</RootNamespace>
+    <AssemblyName>MoviesConnector_V2</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
