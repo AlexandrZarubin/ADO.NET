@@ -25,8 +25,8 @@ namespace MoviesForms
 		}
 		private void MoviesForm_Load(object sender, EventArgs e)
 		{
-			//if (Theme.IsDarkTheme())
-			//	Theme.ApplyDarkTheme(this);
+			if (Theme.IsDarkTheme())
+				Theme.ApplyDarkTheme(this);
 			LoadMovies();
 		}
 		private void LoadMovies()
