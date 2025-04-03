@@ -23,8 +23,8 @@ namespace MoviesConnector
 			"MultiSubnetFailover=False";
 			Connector connector = new Connector(CONNECTION_STRING);
 
-			connector.Select("SELECT * FROM Directors");
-			connector.Select("SELECT * FROM Movies");
+			//connector.Select("SELECT * FROM Directors");
+			//connector.Select("SELECT * FROM Movies");
 		}
 	}
 

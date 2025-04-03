@@ -22,11 +22,12 @@ namespace Academy
 			AllocConsole();
             Console.WriteLine(CONNECTION_STRING);
         }
-		public DataTable Select(string colums,string tables,string condition="")
+		public DataTable Select(string colums,string tables,string condition="",string group_by="")
 		{
 			DataTable table=null;
 			string cmd = $"SELECT {colums} FROM {tables}";
 			if (condition != "") cmd += $" WHERE {condition}";
+			if (group_by != "") cmd += $" GROUP BY {group_by}";
 			SqlCommand command = new SqlCommand(cmd, connection);
 			connection.Open();
 
