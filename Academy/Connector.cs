@@ -8,6 +8,8 @@ using System.Data.SqlClient;
 using System.Configuration;
 
 using System.Runtime.InteropServices;
+using System.Web;
+using System.Runtime.CompilerServices;
 
 namespace Academy
 {
@@ -51,7 +53,30 @@ namespace Academy
 			connection.Close();
 			return table;
 		}
+		public Dictionary<string,int> GetDictionary(string table)
+		{
+			Dictionary<string, int> dictionary = null;
 
+			string column_id = table.ToLower().Remove(table.Length - 1) + "_id";
+			string column_name = table.ToLower().Remove(table.Length-1,1)+ "_name";
+			//string column_name = table.ToLower() + "_name";
+			string cmd = $"SELECT {column_name},{column_id} FROM {table}";
+			SqlCommand command = new SqlCommand (cmd, connection);
+			connection.Open ();
+			SqlDataReader reader = command.ExecuteReader();
+			if(reader.HasRows)
+			{
+				dictionary = new Dictionary<string, int>();
+				while(reader.Read())
+				{
+					dictionary[reader[0].ToString()] = Convert.ToInt32(reader[1]);
+					
+				}
+			}
+			reader.Close ();
+			connection.Close ();
+			return dictionary;
+		}
 		[DllImport("kernel32.dll")]
 		public static extern bool AllocConsole();
 		[DllImport("kernel32.dll")]
