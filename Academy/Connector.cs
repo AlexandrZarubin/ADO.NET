@@ -30,6 +30,7 @@ namespace Academy
 			string cmd = $"SELECT {colums} FROM {tables}";
 			if (condition != "") cmd += $" WHERE {condition}";
 			if (group_by != "") cmd += $" GROUP BY {group_by}";
+
 			SqlCommand command = new SqlCommand(cmd, connection);
 			connection.Open();
 
