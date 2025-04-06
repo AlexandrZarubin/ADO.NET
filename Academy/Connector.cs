@@ -29,7 +29,8 @@ namespace Academy
 			if (condition != "") cmd += $" WHERE {condition}";
 			if (group_by != "") cmd += $" GROUP BY {group_by}";
 			SqlCommand command = new SqlCommand(cmd, connection);
-			connection.Open();
+			if (connection.State != ConnectionState.Open)
+				connection.Open();
 
 			SqlDataReader reader = command.ExecuteReader();
 			if(reader.HasRows)
@@ -48,7 +49,8 @@ namespace Academy
 				}
 			}
 			reader.Close();
-			connection.Close();
+			if (connection.State != ConnectionState.Closed)
+				connection.Close();
 			return table;
 		}
 
