@@ -55,8 +55,9 @@ namespace Academy
 		};
 
 		/////////////////////////////////////////////
-		public Dictionary<string, int> d_directions;
-		public Dictionary<string, int> d_groups;
+		private Dictionary<string, int> d_directions;
+		private Dictionary<string, int> d_groups;
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -73,11 +74,17 @@ namespace Academy
 			statusStripCountLabel.Text = $"Кол-во студентов: {dgvStudents.RowCount - 1}";
 			dgvStudents.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-			d_directions = connector.GetDictionary("Directions");
-			d_groups = connector.GetDictionary("Groups");
+			Dictionary<string, int> tmpDirections = connector.GetDictionary("Directions");
+			d_directions = tmpDirections != null ? tmpDirections : new Dictionary<string, int>();
+
+			Dictionary<string, int> tmpGroups = connector.GetDictionary("Groups");
+			d_groups = tmpGroups != null ? tmpGroups : new Dictionary<string, int>();
+
+			cbStudentsDirection.Items.Add("Все направления");
+			cbStudentsDirection.Items.AddRange(d_directions.Select(d => d.Key.ToString()).ToArray());
+			cbStudentsDirection.SelectedIndex = 0;
 
 			cbStudentsGroup.Items.AddRange(d_groups.Select(g=>g.Key.ToString()).ToArray());
-			cbStudentsDirection.Items.AddRange(d_directions.Select(d => d.Key.ToString()).ToArray());
 			cbGroupsDirection.Items.AddRange(d_directions.Select(d => d.Key.ToString()).ToArray());
 		}
 		void LoadTab(Query query = null)
@@ -98,22 +105,82 @@ namespace Academy
 
 		private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			int i = tabControl.SelectedIndex;
-			Query query = new Query(queries[i]);
+			if (!(sender is ComboBox comboBox) || comboBox.SelectedItem == null) return;
+			int i = tabControl.SelectedIndex;							//индекс вкладки						
+			Query query = new Query(queries[i]);						//объект запроса
 			Console.WriteLine(query.Condition);
-			string tab_name = (sender as ComboBox).Name;
-			string field_name = tab_name.Substring(Array.FindLastIndex<char>(tab_name.ToCharArray(), Char.IsUpper));
+			string tab_name = (sender as ComboBox).Name;                //имя ComboBox
+			string field_name = tab_name.Substring(						//извлекаем название поля
+				Array.
+				FindLastIndex<char>
+				(tab_name.ToCharArray(),
+				Char.IsUpper));
+
 			Console.WriteLine(field_name);
-			string member_name = $"d_{field_name.ToLower()}s";
+			string member_name = $"d_{field_name.ToLower()}s";          //формируем имя поля d_<field>s
 			Console.WriteLine(member_name == nameof(d_directions));
-			Dictionary<string, int> source = this.GetType().GetField(member_name).GetValue(this) as Dictionary<string, int>;
-			//Console.WriteLine(this.GetType().GetField(member_name).GetValue(this));
-			//Console.WriteLine(this.GetType());
-			if (query.Condition != "") query.Condition += " AND";
-			query.Condition += $" [{field_name.ToLower()}] = {source[(sender as ComboBox).SelectedItem.ToString()]}";
+
+			FieldInfo fieldInfo = this.GetType().           // Получаем словарь через рефлексию по имени переменной
+				GetField(member_name, BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+			if (fieldInfo == null) return;                  // Если поле не найдено — выходим
+			
+			Dictionary<string, int> source =                // Получаем сам словарь из поля, приведя его к нужному типу
+				fieldInfo?.GetValue(this) as Dictionary<string, int>;
+
+			// Проверяем, что словарь существует и содержит выбранный элемент из ComboBox
+			if (source == null || !source.ContainsKey(comboBox.SelectedItem.ToString()))
+			{
+				//если выбран элемент по умолчанию в ComboBox направлений
+				if (comboBox == cbStudentsDirection && comboBox.SelectedIndex == 0)
+				{
+					// Очищаем группы и добавляем все доступные группы
+					cbStudentsGroup.Items.Clear();
+					cbStudentsGroup.Items.AddRange(d_groups.Select(g => g.Key).ToArray());
+					cbStudentsGroup.SelectedIndex = -1;
+					LoadTab();
+				}
+				return;												// Выходим, т.к. нужного значения в словаре нет
+			}
+		
+			if (source == null) return;								// Если словарь есть, продолжаем добавлять условие в запрос
+			if (query.Condition != "") query.Condition += " AND";   // Если уже есть условия, добавляем AND
+			
+			query.Condition +=                                      // Добавляем новое условие по выбранному элементу ComboBox
+				$" [{field_name.ToLower()}] = {source[(sender as ComboBox).SelectedItem.ToString()]}";
+			
+			
 			LoadTab(query);
+
+			if ((sender as ComboBox) == cbStudentsDirection)
+			{
+				string selectedDirection =                          // Получаем выбранное направление
+					cbStudentsDirection.SelectedItem.ToString(); 
+
+				int directionId = d_directions[selectedDirection];  // Получаем его ID из словаря направлений
+
+				DataTable filteredGroups =                          // Выполняем SQL-запрос для получения групп, связанных с направлением
+					connector.Select("group_name, group_id", "Groups", $"direction = {directionId}");
+
+				cbStudentsGroup.Items.Clear();						// Очищаем ComboBox групп
+
+				// Если группы найдены — добавляем их в ComboBox
+				if (filteredGroups != null && filteredGroups.Rows.Count > 0)
+				{
+					cbStudentsGroup.Items.AddRange(filteredGroups.Rows.Cast<DataRow>().Select(row => row["group_name"].ToString()).ToArray());
+					cbStudentsGroup.SelectedIndex = -1;
+				}
+				else                                                 // Если групп нет — выводим сообщение
+				{
+					cbStudentsGroup.Items.Add("Нет групп по направлению");
+					cbStudentsGroup.SelectedIndex = 0;
+				}
+			}
 			Console.WriteLine((sender as ComboBox).Name);
 			Console.WriteLine(e);
+
+
 		}
 
 		
