@@ -1,4 +1,5 @@
-﻿using System;
+﻿//DZHome
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -110,6 +111,7 @@ namespace Academy
 			Query query = new Query(queries[i]);						//объект запроса
 			Console.WriteLine(query.Condition);
 			string tab_name = (sender as ComboBox).Name;                //имя ComboBox
+			
 			string field_name = tab_name.Substring(						//извлекаем название поля
 				Array.
 				FindLastIndex<char>
