@@ -27,13 +27,51 @@ namespace AcademyDataSet
 			connection = new SqlConnection(CONNECTION_STRING);
 			AllocConsole();
             Console.WriteLine(CONNECTION_STRING);
-			LoadGroupsRelatedData();
+			//1) Создаем Dataset:
+			GroupsRelatedData = new DataSet();
+			AddTable("Directions", "direction_id,direction_name");
+			AddTable("Groups", "group_id,group_name,direction");
+			AddRelation("GroupsDirections", "Groups,direction", "Directions,direction_id" );
+			PrintGroups();
+			//LoadGroupsRelatedData();
 
+		}
+		public void AddTable(string table,string columns)
+		{
+			
+			//2.1)добавляем таблицу в DataSet
+			GroupsRelatedData.Tables.Add(table);
+			//2.2)добавляемполя(столбики) в таблицу
+			string[] a_coluns=columns.Split(',');
+			
+			for(int i=0;i<a_coluns.Length;i++)
+			{
+				GroupsRelatedData.Tables[table].Columns.Add(a_coluns[i]);
+
+			}
+
+			//GroupsRelatedData.Tables[dsTable_Directions].Columns.Add(dst_col_direction_id, typeof(byte));
+			//GroupsRelatedData.Tables[dsTable_Directions].Columns.Add(dst_col_direction_name, typeof(string));
+			//2.3 Определяем, какое поле будем первичным ключем
+			GroupsRelatedData.Tables[table].PrimaryKey =
+				new DataColumn[] { GroupsRelatedData.Tables[table].Columns[0] };
+			
+			string cmd = $"SELECT {columns} FROM {table}";
+			SqlDataAdapter adapter = new SqlDataAdapter(cmd, connection);
+			adapter.Fill(GroupsRelatedData.Tables[table]);
+			Print(table);
+		}
+		public void AddRelation(string relation_name, string child,string parent)
+		{
+			GroupsRelatedData.Relations.Add
+				(
+				relation_name,
+				GroupsRelatedData.Tables[parent.Split(',')[0]].Columns[parent.Split(',')[1]],
+				GroupsRelatedData.Tables[child.Split(',')[0]].Columns[child.Split(',')[1]]
+				);
 		}
 		void LoadGroupsRelatedData()
 		{
-			//1) Создаем Dataset:
-			GroupsRelatedData = new DataSet();
 
 			//2) Добавляем таблицы в DataSet:
 			const string dsTable_Directions = "Directions";
@@ -75,20 +113,47 @@ namespace AcademyDataSet
 
 			directionsAdapter.Fill(GroupsRelatedData.Tables[dsTable_Directions]);
 			groupsAdapter.Fill(GroupsRelatedData.Tables[dsTable_Groups]);
-
-			//for (int i = 0; i < GroupsRelatedData.Tables["Directions"].Rows.Count; i++)
-			//{
-			//	Console.Write(GroupsRelatedData.Tables["Directions"].Rows[i]+":\t");
-
-			//	for (int j = 0; j < GroupsRelatedData.Tables["Directions"].Columns.Count; j++)
-			//	{
-			//		Console.Write(GroupsRelatedData.Tables["Directions"].Rows[i][j]+"\t");
-			//             }
-			//             Console.WriteLine();
-			//         }
-			PrintTable(GroupsRelatedData.Tables["Directions"]);
+			
+			Print("Directions");
+			Print("Groups");
+			
 		}
+		public void Print(string table)
+		{
+			Console.WriteLine("\n---------------------------------------");
+			for (int i = 0; i < GroupsRelatedData.Tables[table].Columns.Count; i++)
+				Console.Write(GroupsRelatedData.Tables[table].Columns[i].Caption + "\t");
+			Console.WriteLine("\n---------------------------------------");
 
+			for (int i = 0; i < GroupsRelatedData.Tables[table].Rows.Count; i++)
+			{
+				Console.Write(GroupsRelatedData.Tables[table].Rows[i]+":\t");
+				
+				for (int j = 0; j < GroupsRelatedData.Tables[table].Columns.Count; j++)
+				{
+					Console.Write(GroupsRelatedData.Tables[table].Rows[i][j]+"\t");
+                }
+            
+                Console.WriteLine();
+            }
+            Console.WriteLine("\n---------------------------------------");
+
+        }
+		void PrintGroups()
+		{
+            Console.WriteLine("\n---------------------------------------");
+			string table = "Groups";
+			for (int i = 0; i < GroupsRelatedData.Tables[table].Rows.Count; i++)
+			{
+				for (int j = 0; j < GroupsRelatedData.Tables[table].Columns.Count;j++)
+				{
+					Console.Write(GroupsRelatedData.Tables[table].Rows[i][j]+"\t");
+                }
+				Console.WriteLine(GroupsRelatedData.Tables[table].Rows[i].GetParentRow("GroupsDirections")["direction_name"]);
+				Console.WriteLine();
+            }
+            Console.WriteLine("\n---------------------------------------");
+		}
 	[DllImport("kernel32.dll")]
 	public static extern bool AllocConsole();
 
