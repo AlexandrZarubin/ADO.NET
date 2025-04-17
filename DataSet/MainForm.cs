@@ -32,7 +32,14 @@ namespace AcademyDataSet
 			AddTable("Directions", "direction_id,direction_name");
 			AddTable("Groups", "group_id,group_name,direction");
 			AddRelation("GroupsDirections", "Groups,direction", "Directions,direction_id" );
-			PrintGroups();
+			AddTable("Students", "stud_id,last_name,first_name,middle_name,birth_date,group");
+
+			//AddRelation("StudentsGroups", "Students,group", "Groups,group_id");
+			//AddRelation("GroupsDirections", "Groups,direction", "Directions,direction_id");
+			//Print1("Students");
+			Print1("Groups");
+
+			//PrintGroups();
 			//LoadGroupsRelatedData();
 
 		}
@@ -56,10 +63,13 @@ namespace AcademyDataSet
 			GroupsRelatedData.Tables[table].PrimaryKey =
 				new DataColumn[] { GroupsRelatedData.Tables[table].Columns[0] };
 			
-			string cmd = $"SELECT {columns} FROM {table}";
+			string sqlColumns = string.Join(",", a_coluns.Select(col => $"[{col}]"));
+
+			//string cmd = $"SELECT {columns} FROM {table}";
+			string cmd = $"SELECT {sqlColumns} FROM {table}";
 			SqlDataAdapter adapter = new SqlDataAdapter(cmd, connection);
 			adapter.Fill(GroupsRelatedData.Tables[table]);
-			Print(table);
+			Print1(table);
 		}
 		public void AddRelation(string relation_name, string child,string parent)
 		{
@@ -114,10 +124,58 @@ namespace AcademyDataSet
 			directionsAdapter.Fill(GroupsRelatedData.Tables[dsTable_Directions]);
 			groupsAdapter.Fill(GroupsRelatedData.Tables[dsTable_Groups]);
 			
-			Print("Directions");
-			Print("Groups");
+			Print1("Directions");
+			Print1("Groups");
 			
 		}
+		public void Print1(string table)
+		{
+			Console.WriteLine($"\n========== TABLE: {table} ==========\n");	// загаловок
+
+			if (!GroupsRelatedData.Tables.Contains(table))					// проверка названия в DataSet
+			{
+				Console.WriteLine($"Таблица '{table}' не найдена.");		// соощение ошибки
+				return;														// выход таблицы нет
+			}
+
+			DataTable dt = GroupsRelatedData.Tables[table];                 // получаем сылку таблицы из DataSet
+
+			const int colWidth = 15;
+			Console.WriteLine(">> Main row:");                              // основная таблица
+			
+			foreach (DataColumn col in dt.Columns)                          // Перебираем все столбцы таблицы
+				Console.Write(col.ColumnName.PadRight(colWidth));           // Печатаем название столбца 
+			Console.WriteLine();
+			Console.WriteLine(new string('-', colWidth * dt.Columns.Count));// разделиттель
+
+			foreach (DataRow row in dt.Rows)                                // Проходим по всем строкам таблицы
+			{
+				foreach (var item in row.ItemArray)                         // Проходим по каждой ячейке строки
+					Console.Write(item.ToString().PadRight(colWidth));      // Выводим значение
+				Console.WriteLine();
+
+				if (dt.ParentRelations.Count > 0)                           // Если у таблицы есть родительские связи
+				{
+					foreach (DataRelation relation in dt.ParentRelations)   // Перебираем все связи
+					{
+						DataRow parentRow = row.GetParentRow(relation);     // Получаем родительскую строку для текущей строки через эту связь
+						Console.WriteLine($"\t-> Parent [{relation.RelationName}] " + // Перебираем все столбцы родительской таблицы
+							$"({relation.ParentTable.TableName}):");
+
+						if (parentRow != null)                              // Если родительская строка найдена				
+						{
+							foreach (DataColumn col in relation.ParentTable.Columns)// Перебираем все столбцы родительской таблицы
+								Console.WriteLine($"\t   {col.ColumnName}: {parentRow[col]}"); // Печатаем имя столбца и соответствующее значение из родительской строки
+						}
+						else
+						{
+							Console.WriteLine("\t   null");                 // сообщение что родитеской строки нет
+						}
+					}
+				}
+			}	
+		}
+
 		public void Print(string table)
 		{
 			Console.WriteLine("\n---------------------------------------");
