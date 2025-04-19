@@ -1,17 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Data;
-using System.Data.SqlClient;
-using AcademyDataSet1;
 
-namespace AcademyCache1
+namespace AcademyDataSetCache
 {
-	internal class Cache
-	{
+    public class Cache
+    {
 		public DataSet Data { get; private set; }                           // публичное свойство с DataSet (только для чтения извне)
 		private SqlConnection connection;                                   // приватное поле для подключения к SQL Server
 
@@ -20,7 +20,7 @@ namespace AcademyCache1
 		{
 			this.connection = connection;                                   // сохраняем подключение в поле
 			Data = new DataSet();                                           // создаём пустой DataSet
-		}			
+		}
 
 		public void AddTable(string table, string columns)                  // Метод добавляет таблицу и загружает в неё данные
 		{
@@ -45,7 +45,7 @@ namespace AcademyCache1
 			string cmd = "SELECT " + sqlColumns + " FROM " + table;         // формируем SELECT-запрос
 			SqlDataAdapter adapter = new SqlDataAdapter(cmd, connection);   // создаём адаптер
 			adapter.Fill(Data.Tables[table]);                               // загружаем данные из БД в таблицу
-			//Print(table);
+																			//Print(table);
 		}
 
 
@@ -64,13 +64,13 @@ namespace AcademyCache1
 		{
 			Console.WriteLine($"\n========== TABLE: {table} ==========\n"); // заголовок таблицы
 
-			if (!Data.Tables.Contains(table))								// проверка на наличие таблицы в DataSet
+			if (!Data.Tables.Contains(table))                               // проверка на наличие таблицы в DataSet
 			{
 				Console.WriteLine($"Таблица '{table}' не найдена.");        // соощение ошибки
 				return;                                                     // выход, таблицы нет
 			}
 
-			DataTable dt = Data.Tables[table];								// получаем сылку таблицы из DataSet
+			DataTable dt = Data.Tables[table];                              // получаем сылку таблицы из DataSet
 
 			const int colWidth = 15;
 			Console.WriteLine(">> Main row:");                              // основная таблица
@@ -84,14 +84,14 @@ namespace AcademyCache1
 			{
 				for (int j = 0; j < dt.Columns.Count; j++)                  // Проходим по каждой ячейке строки
 				{
-					string value = dt.Rows[i][j]?.ToString() ?? "";			// получаем значение
+					string value = dt.Rows[i][j]?.ToString() ?? "";         // получаем значение
 					Console.Write(value.PadRight(colWidth));                // печатаем выровнено
 				}
 				Console.WriteLine();
 
 				if (dt.ParentRelations.Count > 0)                           // Если у таблицы есть родительские связи
 				{
-					for (int r = 0; r < dt.ParentRelations.Count; r++)		// Перебираем все связи
+					for (int r = 0; r < dt.ParentRelations.Count; r++)      // Перебираем все связи
 					{
 						DataRelation relation = dt.ParentRelations[r];      // текущая связь
 						DataRow parentRow = dt.Rows[i].GetParentRow(relation);// родительская строка
@@ -102,13 +102,13 @@ namespace AcademyCache1
 						{
 							for (int c = 0; c < relation.ParentTable.Columns.Count; c++)// Перебираем все столбцы родительской таблицы
 							{
-								string columnName = relation.ParentTable.Columns[c].ColumnName; 
+								string columnName = relation.ParentTable.Columns[c].ColumnName;
 								Console.WriteLine($"\t   {columnName}: {parentRow[columnName]}");// имя: значение
 							}
 						}
 						else
 						{
-							Console.WriteLine("\t   null");                 
+							Console.WriteLine("\t   null");
 						}
 					}
 				}
@@ -162,3 +162,4 @@ namespace AcademyCache1
 		}
 	}
 }
+

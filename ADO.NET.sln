@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Academy", "Academy\Academy.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSet", "DataSet\DataSet.csproj", "{509B0066-48E2-4F16-A359-7D53ADF15006}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademyDataSetCache", "AcademyDataSetCache\AcademyDataSetCache.csproj", "{4301866E-B4E0-40C9-8165-D4777D592A05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademyDataSetConnector", "AcademyDataSetConnector\AcademyDataSetConnector.csproj", "{C8CD74A8-F042-4DFA-B43A-AC7DFBCC9842}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{509B0066-48E2-4F16-A359-7D53ADF15006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{509B0066-48E2-4F16-A359-7D53ADF15006}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{509B0066-48E2-4F16-A359-7D53ADF15006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4301866E-B4E0-40C9-8165-D4777D592A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4301866E-B4E0-40C9-8165-D4777D592A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4301866E-B4E0-40C9-8165-D4777D592A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4301866E-B4E0-40C9-8165-D4777D592A05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8CD74A8-F042-4DFA-B43A-AC7DFBCC9842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8CD74A8-F042-4DFA-B43A-AC7DFBCC9842}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8CD74A8-F042-4DFA-B43A-AC7DFBCC9842}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8CD74A8-F042-4DFA-B43A-AC7DFBCC9842}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
