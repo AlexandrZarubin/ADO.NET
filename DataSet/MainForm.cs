@@ -28,14 +28,15 @@ namespace AcademyDataSet
 			AllocConsole();
             Console.WriteLine(CONNECTION_STRING);
 			//1) Создаем Dataset:
-			GroupsRelatedData = new DataSet();
+			GroupsRelatedData = new DataSet("GroupsRelatedData");
 			AddTable("Directions", "direction_id,direction_name");
 			AddTable("Groups", "group_id,group_name,direction");
 			AddRelation("GroupsDirections", "Groups,direction", "Directions,direction_id" );
-			PrintGroups();
-			//LoadGroupsRelatedData();
-
-		}
+			Print("Groups");
+            //PrintGroups();
+            //LoadGroupsRelatedData();
+            Console.WriteLine(HasParents("Groups"));
+        }
 		public void AddTable(string table,string columns)
 		{
 			
@@ -59,7 +60,7 @@ namespace AcademyDataSet
 			string cmd = $"SELECT {columns} FROM {table}";
 			SqlDataAdapter adapter = new SqlDataAdapter(cmd, connection);
 			adapter.Fill(GroupsRelatedData.Tables[table]);
-			Print(table);
+			//Print(table);
 		}
 		public void AddRelation(string relation_name, string child,string parent)
 		{
@@ -124,14 +125,34 @@ namespace AcademyDataSet
 			for (int i = 0; i < GroupsRelatedData.Tables[table].Columns.Count; i++)
 				Console.Write(GroupsRelatedData.Tables[table].Columns[i].Caption + "\t");
 			Console.WriteLine("\n---------------------------------------");
-
+			int number_of_parens=GroupsRelatedData.Tables[table].ParentRelations.Count;
+			for (int i = 0; i < number_of_parens; i++)
+			{
+				Console.WriteLine(GroupsRelatedData.Tables[table].ParentRelations[i].ToString());
+            }
+			Console.WriteLine(GroupsRelatedData.Tables[table].ParentRelations.Contains("GroupsDirections"));
 			for (int i = 0; i < GroupsRelatedData.Tables[table].Rows.Count; i++)
 			{
-				Console.Write(GroupsRelatedData.Tables[table].Rows[i]+":\t");
+				//Console.Write(GroupsRelatedData.Tables[table].Rows[i]+":\t");
 				
 				for (int j = 0; j < GroupsRelatedData.Tables[table].Columns.Count; j++)
 				{
-					Console.Write(GroupsRelatedData.Tables[table].Rows[i][j]+"\t");
+
+					if (HasParents(table) &&
+						GroupsRelatedData.Tables[table].ParentRelations[0].ChildColumns.Contains(GroupsRelatedData.Tables[table].Columns[j]))
+					{
+						string paretn_relation_name = !HasParents(table) ? "" :
+							$"{GroupsRelatedData.Tables[table].TableName}{GroupsRelatedData.Tables[table].Columns[j].ColumnName}s";
+						Console.WriteLine(
+							//GroupsRelatedData.Tables[table].ParentRelations[0].ParentColumns[$"{GroupsRelatedData.Tables[table].Columns[j].ColumnName}_name"]
+							GroupsRelatedData.Tables[table].Rows[i].GetParentRow(paretn_relation_name)[$"{GroupsRelatedData.Tables[table].Columns[j].ColumnName}_name"]
+							);
+					}
+					else
+					{
+						Console.Write(GroupsRelatedData.Tables[table].Rows[i][j]+"\t\t");
+					}
+					
                 }
             
                 Console.WriteLine();
@@ -139,6 +160,10 @@ namespace AcademyDataSet
             Console.WriteLine("\n---------------------------------------");
 
         }
+		bool HasParents(string table)
+		{
+			return GroupsRelatedData.Tables[table].ParentRelations.Count > 0;
+		}
 		void PrintGroups()
 		{
             Console.WriteLine("\n---------------------------------------");
