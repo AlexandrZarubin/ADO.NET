@@ -10,13 +10,13 @@ using System.Configuration;
 
 namespace AcademyDataSet
 {
-	internal class Cache
+	public class CacheLibary
 	{
 		readonly string CONNECTION_STRING = "";
 		SqlConnection connection = null;
 		DataSet GroupsRelatedData = null;
-		public DataSet Set { get => GroupsRelatedData; }
-		public Cache(string connectionString)
+
+		public CacheLibary(string connectionString)
 		{
 			CONNECTION_STRING = ConfigurationManager.ConnectionStrings["VPD_311_Import"].ConnectionString;
 			connection = new SqlConnection(CONNECTION_STRING);
