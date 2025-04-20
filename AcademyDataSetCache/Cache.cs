@@ -143,6 +143,7 @@ namespace AcademyDataSetCache
 			Console.WriteLine("\n---------------------------------------");
 		}
 
+
 		public DataTable Select(Query query)
 		{
 			string cmdText = $"SELECT {query.Columns} FROM {query.Tables}";

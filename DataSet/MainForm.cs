@@ -101,7 +101,7 @@ namespace AcademyDataSet
 			
 			InitComboBoxes();
 			dgvStudents.DataSource = cache.Data.Tables["Students"];
-			//cache.Print1("Students");
+			cache.Print1("Students");
 
 			//cache.Print1("Groups");
 			LoadTab();
@@ -132,7 +132,7 @@ namespace AcademyDataSet
 				cbStudentsDirection.Items.Add(name);
 			}
 			
-			// Заполняем словарь всех групп (пока без фильтрации)
+			// Заполняем словарь всех групп 
 			for (int i = 0; i < groups.Rows.Count; i++)
 			{
 				string name = groups.Rows[i]["group_name"].ToString();
@@ -180,7 +180,7 @@ namespace AcademyDataSet
 		}
 
 
-		[DllImport("kernel32.dll")]
+	[DllImport("kernel32.dll")]
 	public static extern bool AllocConsole();
 
 	[DllImport("kernel32.dll")]
