@@ -16,6 +16,7 @@ namespace AcademyDataSet
 		SqlConnection connection = null;
 		DataSet GroupsRelatedData = null;
 		public DataSet Set { get => GroupsRelatedData; }
+		public SqlConnection Connection { get => connection; }
 		public Cache(string connectionString)
 		{
 			CONNECTION_STRING = ConfigurationManager.ConnectionStrings["VPD_311_Import"].ConnectionString;
@@ -28,6 +29,7 @@ namespace AcademyDataSet
 
 			//2.1)добавляем таблицу в DataSet
 			GroupsRelatedData.Tables.Add(table);
+
 			//2.2)добавляемполя(столбики) в таблицу
 			string[] a_coluns = columns.Split(',');
 
@@ -43,7 +45,9 @@ namespace AcademyDataSet
 			GroupsRelatedData.Tables[table].PrimaryKey =
 				new DataColumn[] { GroupsRelatedData.Tables[table].Columns[0] };
 
-			string cmd = $"SELECT {columns} FROM {table}";
+			string safeColumns = string.Join(",", a_coluns.Select(col => $"[{col.Trim()}]"));
+			string cmd = $"SELECT {safeColumns} FROM {table}";
+			//string cmd = $"SELECT {columns} FROM {table}";
 			SqlDataAdapter adapter = new SqlDataAdapter(cmd, connection);
 			adapter.Fill(GroupsRelatedData.Tables[table]);
 			//Print(table);
@@ -107,44 +111,74 @@ namespace AcademyDataSet
 		}
 		public void Print(string table)
 		{
-			Console.WriteLine("\n---------------------------------------");
-			for (int i = 0; i < GroupsRelatedData.Tables[table].Columns.Count; i++)
-				Console.Write(GroupsRelatedData.Tables[table].Columns[i].Caption + "\t");
-			Console.WriteLine("\n---------------------------------------");
-			int number_of_parens = GroupsRelatedData.Tables[table].ParentRelations.Count;
-			for (int i = 0; i < number_of_parens; i++)
+			Console.WriteLine($"\n=== Таблица: {table} ===\n");
+
+			if (!GroupsRelatedData.Tables.Contains(table))
 			{
-				Console.WriteLine(GroupsRelatedData.Tables[table].ParentRelations[i].ToString());
+				Console.WriteLine("Таблица не найдена.");
+				return;
 			}
-			Console.WriteLine(GroupsRelatedData.Tables[table].ParentRelations.Contains("GroupsDirections"));
-			for (int i = 0; i < GroupsRelatedData.Tables[table].Rows.Count; i++)
+
+			// Заголовки
+			for (int i = 0; i < GroupsRelatedData.Tables[table].Columns.Count; i++)
 			{
-				//Console.Write(GroupsRelatedData.Tables[table].Rows[i]+":\t");
+				Console.Write(GroupsRelatedData.Tables[table].Columns[i].ColumnName + "\t\t");
+			}
+			Console.WriteLine("\n----------------------------------");
 
-				for (int j = 0; j < GroupsRelatedData.Tables[table].Columns.Count; j++)
+			// Обход строк
+			for (int rowIndex = 0; rowIndex < GroupsRelatedData.Tables[table].Rows.Count; rowIndex++)
+			{
+				DataRow row = GroupsRelatedData.Tables[table].Rows[rowIndex];
+
+				for (int colIndex = 0; colIndex < GroupsRelatedData.Tables[table].Columns.Count; colIndex++)
 				{
+					DataColumn column = GroupsRelatedData.Tables[table].Columns[colIndex];
+					bool valuePrinted = false;
 
-					if (HasParents(table) &&
-						GroupsRelatedData.Tables[table].ParentRelations[0].ChildColumns.Contains(GroupsRelatedData.Tables[table].Columns[j]))
+					// Проверяем каждую связь с родителем
+					for (int relIndex = 0; relIndex < GroupsRelatedData.Tables[table].ParentRelations.Count; relIndex++)
 					{
-						string paretn_relation_name = !HasParents(table) ? "" :
-							$"{GroupsRelatedData.Tables[table].TableName}{GroupsRelatedData.Tables[table].Columns[j].ColumnName}s";
-						Console.WriteLine(
-							//GroupsRelatedData.Tables[table].ParentRelations[0].ParentColumns[$"{GroupsRelatedData.Tables[table].Columns[j].ColumnName}_name"]
-							GroupsRelatedData.Tables[table].Rows[i].GetParentRow(paretn_relation_name)[$"{GroupsRelatedData.Tables[table].Columns[j].ColumnName}_name"]
-							);
-					}
-					else
-					{
-						Console.Write(GroupsRelatedData.Tables[table].Rows[i][j] + "\t\t");
+						DataRelation relation = GroupsRelatedData.Tables[table].ParentRelations[relIndex];
+
+						// Если текущий столбец — часть этой связи (child column)
+						for (int c = 0; c < relation.ChildColumns.Length; c++)
+						{
+							if (relation.ChildColumns[c] == column)
+							{
+								// Получаем родительскую строку
+								DataRow parent = row.GetParentRow(relation);
+								if (parent != null)
+								{
+									// Ищем в родителе колонку с "name"
+									for (int pc = 0; pc < relation.ParentTable.Columns.Count; pc++)
+									{
+										DataColumn parentCol = relation.ParentTable.Columns[pc];
+										if (parentCol.ColumnName.Contains("name"))
+										{
+											Console.Write(parent[parentCol] + "\t\t");
+											valuePrinted = true;
+											break;
+										}
+									}
+								}
+							}
+							if (valuePrinted) break;
+						}
+						if (valuePrinted) break;
 					}
 
+					// Если не нашли родительскую колонку — выводим обычное значение
+					if (!valuePrinted)
+					{
+						Console.Write(row[column] + "\t\t");
+					}
 				}
 
 				Console.WriteLine();
 			}
-			Console.WriteLine("\n---------------------------------------");
 
+			Console.WriteLine("\n=============================\n");
 		}
 		public bool HasParents(string table)
 		{
