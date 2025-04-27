@@ -106,7 +106,7 @@ namespace AcademyDataSet
 					}
 					else
 					{
-						string filter = "(direction = " + selectedValue + ")";
+						string filter = "(group_id = -1) OR (direction = " + selectedValue + ")";
 						groupsTable.DefaultView.RowFilter = filter;         // Фильтруем группы по выбранному направлению
 					}
 
@@ -145,7 +145,7 @@ namespace AcademyDataSet
 		}
 		void SetReloadInterval(int minutes, int seconds = 0)                    // задания времени
 		{
-			reloadIntervalSeconds = (minutes * 60) + seconds;
+			reloadIntervalSeconds = (minutes * 60) + seconds;					//переводим в секунды 
 			timeLeftSeconds = reloadIntervalSeconds;							// Установка начального значения таймера
 		}
 		void ReloadTimer_Tick(object sender, EventArgs e)
@@ -180,7 +180,7 @@ namespace AcademyDataSet
 				set.Relations.RemoveAt(i);                                      // Удаляем все связи между таблицами
 			}
 
-			// Удаляем сначала ForeignKeyConstraints вручную
+			// Удаляем  ForeignKeyConstraints 
 			for (int t = 0; t < set.Tables.Count; t++)
 			{
 				DataTable table = set.Tables[t];
@@ -201,7 +201,7 @@ namespace AcademyDataSet
 				table.Constraints.Clear();
 			}
 
-			// Теперь можно удалить таблицы
+			// удаляем таблицы
 			for (int i = set.Tables.Count - 1; i >= 0; i--)
 			{
 				set.Tables.RemoveAt(i);                                         // Удаляем все таблицы
@@ -217,7 +217,7 @@ namespace AcademyDataSet
 			// 1) Убираем обработчик перед очисткой
 			cbGoups.SelectedIndexChanged -= cbGoups_SelectedIndexChanged;       // Отключаем обработчик на время
 
-			// Очищаем старые данные
+			
 			ClearDataSet(cache.Set);                                            // Очищаем старые данные
 
 			// 2) Загружаем заново таблицы и связи
@@ -241,7 +241,7 @@ namespace AcademyDataSet
 
 			// Добавляем обратно "Все направления" и "Все группы"
 			DataTable directionsTable = cache.Set.Tables["Directions"];
-			if (!directionsTable.Rows.Cast<DataRow>().Any(r => r["direction_id"].ToString() == "-1"))
+			if (!directionsTable.AsEnumerable().Select(r => r["direction_id"].ToString()).Contains("-1"))
 			{
 				DataRow allRow = directionsTable.NewRow();
 				allRow["direction_id"] = -1;
@@ -250,7 +250,7 @@ namespace AcademyDataSet
 			}
 
 			DataTable groupsTable = cache.Set.Tables["Groups"];
-			if (!groupsTable.Rows.Cast<DataRow>().Any(r => r["group_id"].ToString() == "-1"))
+			if (!groupsTable.AsEnumerable().Select(r => r["group_id"].ToString()).Contains("-1"))
 			{
 				DataRow allGroupsRow = groupsTable.NewRow();
 				allGroupsRow["group_id"] = -1;
@@ -260,12 +260,12 @@ namespace AcademyDataSet
 			}
 
 			// Восстанавливаем выбранные значения
-			if (savedDirection != null && directionsTable.AsEnumerable().Any(r => r["direction_id"].ToString() == savedDirection.ToString()))
+			if (savedDirection != null)
 				cbDirections.SelectedValue = savedDirection;
 			else
 				cbDirections.SelectedValue = -1;
 
-			if (savedGroup != null && groupsTable.AsEnumerable().Any(r => r["group_id"].ToString() == savedGroup.ToString()))
+			if (savedGroup != null)
 				cbGoups.SelectedValue = savedGroup;
 			else
 				cbGoups.SelectedValue = -1;
